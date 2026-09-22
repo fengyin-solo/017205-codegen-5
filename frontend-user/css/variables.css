@@ -1,55 +1,165 @@
-/* ========================================
-   CSS 变量 - 设计系统
-   ======================================== */
+/* ================================================================================
+   CSS 变量 - 设计系统（深浅双主题配色方案）
+   ================================================================================
 
+   【配色口径】
+   1. 令牌分三层，组件只允许引用语义层/组件层，禁止在组件样式中写死颜色：
+      - 品牌色板层：--neon-*（霓虹主色，附 --*-rgb 三通道令牌供 rgba() 派生透明度）
+      - 语义层：    --text-*（文字）、--success/--warning/--error/--info（状态色）、
+                    --bg-* / --surface-* / --overlay-*（表面）、--glass-border-*（描边）
+      - 组件层：    --chart-*（图表调色板）、--toast-*、--sidebar-*、--tag-*、--aurora-* 等
+   2. 双主题通过 <html data-theme="dark|light"> 切换：
+      - :root 为深色主题（默认，原有霓虹色系，观感与布局保持不变）
+      - [data-theme="light"] 为浅色主题，全量覆盖彩色令牌
+   3. 所有 rgba() 着色必须经由 --*-rgb 三通道令牌派生（如 rgba(var(--error-rgb), .15)），
+      保证主题切换时无残留旧配色。
+   4. 切换结果持久化于 localStorage（key: dashboard-theme），由 js/theme.js 管理，
+      首绘前由 index.html 内联脚本恢复，无闪烁。
+
+   【判定标准】
+   - 采用 WCAG 2.1 相对亮度对比度算法，目标等级 AA。
+   - 校验脚本：node scripts/verify-contrast.js（直接读取本文件令牌实测，CI 可用）。
+   - 完整说明见 frontend-user/DESIGN-SYSTEM.md。
+
+   【可读阈值】
+   - 正文 / 状态文字（含压在同色 tint 底上）：对比度 >= 4.5:1
+   - 大字号文字（>=24px 或 >=18.5px bold）与图标/图形边界：>= 3:1
+   - 白字压品牌徽章/按钮底色：浅色主题 >= 4.5:1；
+     深色主题为霓虹品牌表达层，允许 >= 3:1（图形级），并辅以文字阴影保证可读。
+   ================================================================================ */
+
+/* ---------- 深色主题（默认 · 霓虹色系） ---------- */
 :root {
-    /* 主色调 */
+    color-scheme: dark;
+
+    /* 表面 */
     --bg-dark: #0a0a0f;
     --bg-darker: #050508;
     --bg-card: rgba(20, 20, 35, 0.7);
     --bg-card-hover: rgba(30, 30, 50, 0.8);
-    
-    /* 霓虹色系 */
+    --surface-panel: rgba(20, 20, 35, 0.5);
+    --surface-panel-hover: rgba(30, 30, 50, 0.7);
+    --surface-inset: rgba(0, 0, 0, 0.35);
+    --surface-inset-hover: rgba(0, 0, 0, 0.5);
+    --sidebar-bg: rgba(10, 10, 18, 0.92);
+    --toast-bg: rgba(20, 20, 35, 0.95);
+    --card-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    /* 叠层（用于胶囊、进度槽、次级按钮等中性底） */
+    --overlay-subtle: rgba(255, 255, 255, 0.06);
+    --overlay-soft: rgba(255, 255, 255, 0.08);
+    --overlay-btn: rgba(255, 255, 255, 0.1);
+    --overlay-btn-hover: rgba(255, 255, 255, 0.15);
+
+    /* 霓虹色系（品牌色板 + RGB 三通道） */
     --neon-purple: #a855f7;
+    --neon-purple-rgb: 168, 85, 247;
     --neon-purple-light: #c084fc;
     --neon-pink: #ec4899;
+    --neon-pink-rgb: 236, 72, 153;
     --neon-pink-light: #f472b6;
     --neon-cyan: #06b6d4;
+    --neon-cyan-rgb: 6, 182, 212;
     --neon-cyan-light: #22d3ee;
     --neon-green: #10b981;
+    --neon-green-rgb: 16, 185, 129;
     --neon-green-light: #34d399;
     --neon-blue: #3b82f6;
     --neon-orange: #f97316;
     --neon-yellow: #eab308;
-    
-    /* 状态色 */
+
+    /* 状态色（文字/图标用途，深色底上对比度均 >= 4.5:1） */
     --success: #10b981;
+    --success-rgb: 16, 185, 129;
     --warning: #f59e0b;
+    --warning-rgb: 245, 158, 11;
     --error: #ef4444;
+    --error-rgb: 239, 68, 68;
     --info: #3b82f6;
-    
+    --info-rgb: 59, 130, 246;
+
+    /* 状态色 tint 底（状态文字压其上仍需 >= 4.5:1）与描边 */
+    --success-tint: rgba(var(--success-rgb), 0.1);
+    --warning-tint: rgba(var(--warning-rgb), 0.1);
+    --error-tint: rgba(var(--error-rgb), 0.1);
+    --info-tint: rgba(var(--info-rgb), 0.1);
+    --success-border: rgba(var(--success-rgb), 0.35);
+    --error-border: rgba(var(--error-rgb), 0.35);
+
+    /* 徽章渐变（白字压底，深色主题按图形级 >= 3:1 标定） */
+    --tag-current-from: #ef4444;
+    --tag-current-to: #dc2626;
+    --tag-target-from: #059669;
+    --tag-target-to: #047857;
+
     /* 文字色 */
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    
+    --text-muted: #7d8ca1;
+
     /* 边框 */
-    --glass-border: rgba(168, 85, 247, 0.3);
-    --glass-border-hover: rgba(168, 85, 247, 0.5);
-    
-    /* 阴影 */
+    --glass-border: rgba(var(--neon-purple-rgb), 0.3);
+    --glass-border-hover: rgba(var(--neon-purple-rgb), 0.5);
+
+    /* 阴影与辉光 */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.4);
-    --shadow-glow-purple: 0 0 30px rgba(168, 85, 247, 0.4);
-    --shadow-glow-pink: 0 0 30px rgba(236, 72, 153, 0.4);
-    --shadow-glow-cyan: 0 0 30px rgba(6, 182, 212, 0.4);
-    
+    --shadow-glow-purple: 0 0 30px rgba(var(--neon-purple-rgb), 0.4);
+    --shadow-glow-pink: 0 0 30px rgba(var(--neon-pink-rgb), 0.4);
+    --shadow-glow-cyan: 0 0 30px rgba(var(--neon-cyan-rgb), 0.4);
+    --sidebar-shadow: -10px 0 40px rgba(0, 0, 0, 0.5), -4px 0 20px rgba(var(--neon-purple-rgb), 0.15);
+    --toast-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
     /* 渐变 */
     --gradient-purple-pink: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
     --gradient-cyan-green: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
     --gradient-blue-purple: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-    
+    --gradient-title: linear-gradient(135deg, #ffffff 0%, var(--neon-purple) 40%, var(--neon-pink) 70%, var(--neon-cyan) 100%);
+    --gradient-sidebar-title: linear-gradient(135deg, #ffffff, var(--neon-purple-light));
+
+    /* 氛围层（背景极光 / 网格线） */
+    --aurora-1: rgba(var(--neon-purple-rgb), 0.15);
+    --aurora-2: rgba(var(--neon-pink-rgb), 0.12);
+    --aurora-3: rgba(var(--neon-cyan-rgb), 0.08);
+    --aurora-4: rgba(var(--neon-green-rgb), 0.08);
+    --grid-line: rgba(var(--neon-purple-rgb), 0.03);
+
+    /* 控件杂项 */
+    --scrollbar-track: rgba(0, 0, 0, 0.3);
+    --selection-bg: rgba(var(--neon-purple-rgb), 0.4);
+    --tool-tag-hover-bg: rgba(var(--neon-purple-rgb), 0.35);
+    --tool-tag-intl-hover-bg: rgba(var(--neon-cyan-rgb), 0.3);
+    --tool-tag-domestic-hover-bg: rgba(var(--neon-pink-rgb), 0.3);
+
+    /* 矩阵表头（副标题文字压 tint 底需 >= 4.5:1） */
+    --matrix-thead-bg: linear-gradient(135deg, rgba(var(--neon-purple-rgb), 0.25), rgba(var(--neon-pink-rgb), 0.15));
+    --phase-subtitle: var(--neon-cyan);
+
+    /* 图表调色板（ECharts 经 getComputedStyle 读取，随主题同步换色） */
+    --chart-funnel-1: rgba(var(--neon-purple-rgb), 0.9);
+    --chart-funnel-2: rgba(var(--neon-purple-rgb), 0.75);
+    --chart-funnel-3: rgba(var(--neon-pink-rgb), 0.8);
+    --chart-funnel-4: rgba(var(--error-rgb), 0.85);
+    --chart-funnel-5: rgba(var(--error-rgb), 0.95);
+    --chart-funnel-border: rgba(var(--neon-purple-rgb), 0.5);
+    --chart-funnel-shadow: rgba(var(--neon-purple-rgb), 0.3);
+    --chart-funnel-shadow-hover: rgba(var(--neon-purple-rgb), 0.5);
+    --chart-label-on-fill: #ffffff;
+    --chart-radar-current: var(--error);
+    --chart-radar-current-area: rgba(var(--error-rgb), 0.3);
+    --chart-radar-benchmark: var(--neon-green);
+    --chart-radar-benchmark-area: rgba(var(--neon-green-rgb), 0.2);
+    --chart-symbol-border: #ffffff;
+    --chart-axis-text: var(--text-secondary);
+    --chart-split-line: rgba(var(--neon-purple-rgb), 0.15);
+    --chart-split-area-a: rgba(var(--neon-purple-rgb), 0.02);
+    --chart-split-area-b: rgba(var(--neon-purple-rgb), 0.06);
+    --chart-axis-line: rgba(var(--neon-purple-rgb), 0.2);
+    --chart-tooltip-bg: rgba(20, 20, 35, 0.95);
+    --chart-tooltip-border: rgba(var(--neon-purple-rgb), 0.3);
+    --chart-tooltip-text: var(--text-primary);
+
     /* 间距 */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -57,20 +167,147 @@
     --spacing-lg: 24px;
     --spacing-xl: 32px;
     --spacing-2xl: 48px;
-    
+
     /* 圆角 */
     --radius-sm: 6px;
     --radius-md: 12px;
     --radius-lg: 16px;
     --radius-xl: 24px;
     --radius-full: 9999px;
-    
+
     /* 过渡 */
     --transition-fast: 0.15s ease;
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
-    
+
     /* 字体 */
     --font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+/* ---------- 浅色主题（文字色与状态色全量按 WCAG 2.1 AA >= 4.5:1 标定） ---------- */
+[data-theme="light"] {
+    color-scheme: light;
+
+    /* 表面 */
+    --bg-dark: #eef0f8;
+    --bg-darker: #e2e5f1;
+    --bg-card: rgba(255, 255, 255, 0.75);
+    --bg-card-hover: rgba(255, 255, 255, 0.92);
+    --surface-panel: rgba(255, 255, 255, 0.6);
+    --surface-panel-hover: rgba(255, 255, 255, 0.85);
+    --surface-inset: rgba(27, 28, 48, 0.05);
+    --surface-inset-hover: rgba(27, 28, 48, 0.09);
+    --sidebar-bg: rgba(255, 255, 255, 0.92);
+    --toast-bg: rgba(255, 255, 255, 0.97);
+    --card-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    /* 叠层 */
+    --overlay-subtle: rgba(27, 28, 48, 0.06);
+    --overlay-soft: rgba(27, 28, 48, 0.08);
+    --overlay-btn: rgba(27, 28, 48, 0.07);
+    --overlay-btn-hover: rgba(27, 28, 48, 0.12);
+
+    /* 霓虹色系（浅色底上的等效深色霓虹，色相不变、明度下沉） */
+    --neon-purple: #7c3aed;
+    --neon-purple-rgb: 124, 58, 237;
+    --neon-purple-light: #8b5cf6;
+    --neon-pink: #ce1c6d;
+    --neon-pink-rgb: 206, 28, 109;
+    --neon-pink-light: #e14389;
+    --neon-cyan: #0e7490;
+    --neon-cyan-rgb: 14, 116, 144;
+    --neon-cyan-light: #155e75;
+    --neon-green: #047857;
+    --neon-green-rgb: 4, 120, 87;
+    --neon-green-light: #059669;
+    --neon-blue: #1d4ed8;
+    --neon-orange: #c2410c;
+    --neon-yellow: #a16207;
+
+    /* 状态色（浅色底上对比度均 >= 4.5:1） */
+    --success: #047857;
+    --success-rgb: 4, 120, 87;
+    --warning: #a15207;
+    --warning-rgb: 161, 82, 7;
+    --error: #c81e1e;
+    --error-rgb: 200, 30, 30;
+    --info: #1d4ed8;
+    --info-rgb: 29, 78, 216;
+
+    /* 状态色 tint 底与描边 */
+    --success-tint: rgba(var(--success-rgb), 0.1);
+    --warning-tint: rgba(var(--warning-rgb), 0.1);
+    --error-tint: rgba(var(--error-rgb), 0.1);
+    --info-tint: rgba(var(--info-rgb), 0.1);
+    --success-border: rgba(var(--success-rgb), 0.4);
+    --error-border: rgba(var(--error-rgb), 0.4);
+
+    /* 徽章渐变（白字压底 >= 4.5:1） */
+    --tag-current-from: #c81e1e;
+    --tag-current-to: #991b1b;
+    --tag-target-from: #047857;
+    --tag-target-to: #065f46;
+
+    /* 文字色 */
+    --text-primary: #1b1c30;
+    --text-secondary: #454a68;
+    --text-muted: #5d6280;
+
+    /* 边框 */
+    --glass-border: rgba(var(--neon-purple-rgb), 0.28);
+    --glass-border-hover: rgba(var(--neon-purple-rgb), 0.5);
+
+    /* 阴影与辉光（浅色主题减弱） */
+    --shadow-sm: 0 2px 8px rgba(30, 27, 75, 0.08);
+    --shadow-md: 0 8px 32px rgba(30, 27, 75, 0.1);
+    --shadow-lg: 0 20px 60px rgba(30, 27, 75, 0.14);
+    --shadow-glow-purple: 0 0 30px rgba(var(--neon-purple-rgb), 0.22);
+    --shadow-glow-pink: 0 0 30px rgba(var(--neon-pink-rgb), 0.22);
+    --shadow-glow-cyan: 0 0 30px rgba(var(--neon-cyan-rgb), 0.22);
+    --sidebar-shadow: -10px 0 40px rgba(30, 27, 75, 0.12), -4px 0 20px rgba(var(--neon-purple-rgb), 0.1);
+    --toast-shadow: 0 10px 40px rgba(30, 27, 75, 0.16), 0 0 0 1px rgba(var(--neon-purple-rgb), 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    /* 渐变 */
+    --gradient-title: linear-gradient(135deg, #3b0764 0%, var(--neon-purple) 40%, var(--neon-pink) 70%, var(--neon-cyan) 100%);
+    --gradient-sidebar-title: linear-gradient(135deg, #3b0764, var(--neon-purple-light));
+
+    /* 氛围层 */
+    --aurora-1: rgba(var(--neon-purple-rgb), 0.1);
+    --aurora-2: rgba(var(--neon-pink-rgb), 0.08);
+    --aurora-3: rgba(var(--neon-cyan-rgb), 0.06);
+    --aurora-4: rgba(var(--neon-green-rgb), 0.06);
+    --grid-line: rgba(var(--neon-purple-rgb), 0.05);
+
+    /* 控件杂项 */
+    --scrollbar-track: rgba(27, 28, 48, 0.08);
+    --selection-bg: rgba(var(--neon-purple-rgb), 0.3);
+    --tool-tag-hover-bg: var(--neon-purple);
+    --tool-tag-intl-hover-bg: var(--neon-cyan);
+    --tool-tag-domestic-hover-bg: var(--neon-pink);
+
+    /* 矩阵表头（副标题文字压 tint 底需 >= 4.5:1） */
+    --matrix-thead-bg: linear-gradient(135deg, rgba(var(--neon-purple-rgb), 0.18), rgba(var(--neon-pink-rgb), 0.1));
+    --phase-subtitle: #155e75;
+
+    /* 图表调色板（漏斗段加深，保证段内白字 >= 4.5:1） */
+    --chart-funnel-1: rgba(var(--neon-purple-rgb), 0.95);
+    --chart-funnel-2: rgba(var(--neon-purple-rgb), 0.88);
+    --chart-funnel-3: rgba(var(--neon-pink-rgb), 0.92);
+    --chart-funnel-4: rgba(var(--error-rgb), 0.94);
+    --chart-funnel-5: #b91c1c;
+    --chart-funnel-border: rgba(var(--neon-purple-rgb), 0.5);
+    --chart-funnel-shadow: rgba(var(--neon-purple-rgb), 0.25);
+    --chart-funnel-shadow-hover: rgba(var(--neon-purple-rgb), 0.4);
+    --chart-radar-current: var(--error);
+    --chart-radar-current-area: rgba(var(--error-rgb), 0.22);
+    --chart-radar-benchmark: var(--neon-green);
+    --chart-radar-benchmark-area: rgba(var(--neon-green-rgb), 0.16);
+    --chart-split-line: rgba(var(--neon-purple-rgb), 0.18);
+    --chart-split-area-a: rgba(var(--neon-purple-rgb), 0.03);
+    --chart-split-area-b: rgba(var(--neon-purple-rgb), 0.07);
+    --chart-axis-line: rgba(var(--neon-purple-rgb), 0.25);
+    --chart-tooltip-bg: rgba(255, 255, 255, 0.97);
+    --chart-tooltip-border: rgba(var(--neon-purple-rgb), 0.3);
+    --chart-tooltip-text: var(--text-primary);
 }

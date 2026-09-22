@@ -11,6 +11,9 @@ class App {
         if (this.initialized) return;
         this.initialized = true;
 
+        // 初始化主题（恢复用户已保存的配色方案）
+        window.themeManager.init();
+
         // 初始化组件
         window.componentRenderer.init();
 

@@ -159,13 +159,13 @@ const statsData = [
     { icon: '🔥', value: '3个', label: '核心断层待解决', trend: null }
 ];
 
-// 漏斗图数据
+// 漏斗图数据（配色由设计系统变量层 --chart-funnel-* 令牌提供，随主题切换）
 const funnelData = [
-    { value: 100, name: '曝光触达', color: 'rgba(168, 85, 247, 0.9)' },
-    { value: 45, name: '门店进店', color: 'rgba(168, 85, 247, 0.75)' },
-    { value: 20, name: '扫码入会', color: 'rgba(236, 72, 153, 0.8)' },
-    { value: 8, name: '首次购买', color: 'rgba(239, 68, 68, 0.85)' },
-    { value: 3, name: '复购留存', color: 'rgba(239, 68, 68, 0.95)' }
+    { value: 100, name: '曝光触达' },
+    { value: 45, name: '门店进店' },
+    { value: 20, name: '扫码入会' },
+    { value: 8, name: '首次购买' },
+    { value: 3, name: '复购留存' }
 ];
 
 const diagnosticSummary = {
@@ -173,14 +173,14 @@ const diagnosticSummary = {
         label: '阶段1：沉睡通讯录',
         subtitle: '资产留存',
         score: 20,
-        color: '#ef4444',
+        color: 'var(--error)',
         description: '会员体系处于初始阶段，仅完成基础资产留存，六大维度均处于低位'
     },
     targetPosition: {
         label: '阶段2→3：社交连接体→智能价值网',
         subtitle: '活跃复购→预测生态',
         score: 80,
-        color: '#10b981',
+        color: 'var(--neon-green)',
         gap: '+2级跨越'
     },
     keyGaps: [
@@ -214,7 +214,7 @@ const diagnosticSummary = {
     ]
 };
 
-// 雷达图数据
+// 雷达图数据（系列配色由变量层 --chart-radar-* 令牌提供：现状=状态色，标杆=霓虹绿）
 const radarData = {
     indicators: [
         { name: '全域获客', max: 100 },
@@ -227,15 +227,11 @@ const radarData = {
     series: [
         {
             name: '佳贝艾特现状',
-            value: [25, 20, 15, 20, 10, 30],
-            color: '#ef4444',
-            areaColor: 'rgba(239, 68, 68, 0.3)'
+            value: [25, 20, 15, 20, 10, 30]
         },
         {
             name: '行业标杆',
-            value: [85, 80, 90, 85, 80, 85],
-            color: '#10b981',
-            areaColor: 'rgba(16, 185, 129, 0.2)'
+            value: [85, 80, 90, 85, 80, 85]
         }
     ]
 };

@@ -58,7 +58,7 @@ class ComponentRenderer {
             html += `
                 <th>
                     <div style="font-weight: 700;">${p.name}</div>
-                    <div style="font-size: 12px; color: var(--neon-cyan); margin-top: 6px; opacity: 0.9;">
+                    <div style="font-size: 12px; color: var(--phase-subtitle); margin-top: 6px; opacity: 0.9;">
                         焦点: ${p.subtitle}
                     </div>
                 </th>
@@ -168,20 +168,19 @@ class ComponentRenderer {
         });
     }
 
-    // 创建粒子效果
+    // 创建粒子效果（颜色类取自主题令牌，随主题切换自动换色）
     createParticles() {
         const container = document.querySelector('.particles');
         if (!container) return;
 
-        const colors = ['#a855f7', '#ec4899', '#06b6d4', '#10b981'];
-        
+        const colorClasses = ['particle--purple', 'particle--pink', 'particle--cyan', 'particle--green'];
+
         for (let i = 0; i < 30; i++) {
             const particle = document.createElement('div');
-            particle.className = 'particle';
+            particle.className = `particle ${colorClasses[Math.floor(Math.random() * colorClasses.length)]}`;
             particle.style.left = `${Math.random() * 100}%`;
             particle.style.animationDelay = `${Math.random() * 15}s`;
             particle.style.animationDuration = `${15 + Math.random() * 10}s`;
-            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
             particle.style.width = `${2 + Math.random() * 4}px`;
             particle.style.height = particle.style.width;
             container.appendChild(particle);
@@ -227,7 +226,7 @@ class ComponentRenderer {
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     target.style.transition = 'box-shadow 0.5s ease';
-                    target.style.boxShadow = '0 0 40px rgba(168, 85, 247, 0.5)';
+                    target.style.boxShadow = '0 0 40px rgba(var(--neon-purple-rgb), 0.5)';
                     setTimeout(() => { target.style.boxShadow = ''; }, 2000);
                 }
             });

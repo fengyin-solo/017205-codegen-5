@@ -18,6 +18,18 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="css/components.css">
+
+    <!-- 配色方案防闪烁：首绘前恢复用户已保存的主题（与 js/theme.js 的 storageKey 一致） -->
+    <script>
+        (function () {
+            var theme = 'dark';
+            try {
+                var saved = localStorage.getItem('dashboard-theme');
+                if (saved === 'light' || saved === 'dark') theme = saved;
+            } catch (e) {}
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
 </head>
 <body>
     <!-- 诊断摘要侧栏 -->
@@ -49,6 +61,9 @@
         
         <!-- 头部区域 -->
         <header class="header">
+            <button class="theme-toggle" id="themeToggle" aria-label="切换配色方案" aria-pressed="false" title="切换配色方案">
+                <span class="theme-toggle-icon">🌙</span>
+            </button>
             <div class="header-badge">
                 <span>🎯</span>
                 <span>2026 战略诊断报告</span>
@@ -119,6 +134,7 @@
     
     <!-- JavaScript 文件 -->
     <script src="js/toast.js"></script>
+    <script src="js/theme.js"></script>
     <script src="js/data.js"></script>
     <script src="js/charts.js"></script>
     <script src="js/components.js"></script>
