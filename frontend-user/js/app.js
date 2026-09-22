@@ -11,12 +11,18 @@ class App {
         if (this.initialized) return;
         this.initialized = true;
 
+        // 初始化主题（必须先于图表：图表首绘即读取主题色板）
+        window.themeManager.init();
+        window.themeManager.onChange((theme) => {
+            const label = theme === 'light' ? '浅色霓虹' : '深色霓虹';
+            window.toast.info('配色方案已切换', `当前为「${label}」主题，刷新后保持`, 2500);
+        });
+
         // 初始化组件
         window.componentRenderer.init();
 
         // 初始化图表
-        window.chartManager.initFunnelChart('funnelChart');
-        window.chartManager.initRadarChart('radarChart');
+        window.chartManager.init();
 
         // 监听窗口大小变化
         window.addEventListener('resize', this.handleResize.bind(this));

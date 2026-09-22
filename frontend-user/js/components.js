@@ -168,13 +168,14 @@ class ComponentRenderer {
         });
     }
 
-    // 创建粒子效果
+    // 创建粒子效果（颜色取自主题粒子色板，切换主题时清空重建）
     createParticles() {
         const container = document.querySelector('.particles');
         if (!container) return;
 
-        const colors = ['#a855f7', '#ec4899', '#06b6d4', '#10b981'];
-        
+        container.innerHTML = '';
+        const colors = window.themeManager.getParticleColors();
+
         for (let i = 0; i < 30; i++) {
             const particle = document.createElement('div');
             particle.className = 'particle';
@@ -227,7 +228,8 @@ class ComponentRenderer {
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     target.style.transition = 'box-shadow 0.5s ease';
-                    target.style.boxShadow = '0 0 40px rgba(168, 85, 247, 0.5)';
+                    const glowColor = window.themeManager.getVar('--rgb-purple');
+                    target.style.boxShadow = `0 0 40px rgba(${glowColor}, 0.5)`;
                     setTimeout(() => { target.style.boxShadow = ''; }, 2000);
                 }
             });
@@ -243,7 +245,7 @@ class ComponentRenderer {
         html += `
             <div class="sidebar-position-card is-current">
                 <div class="sidebar-position-header">
-                    <div class="sidebar-position-label" style="color: ${d.currentPosition.color}">${d.currentPosition.label}</div>
+                    <div class="sidebar-position-label" style="color: var(${d.currentPosition.colorVar})">${d.currentPosition.label}</div>
                     <div class="sidebar-position-subtitle">${d.currentPosition.subtitle}</div>
                 </div>
                 <div class="sidebar-score-bar">
@@ -259,7 +261,7 @@ class ComponentRenderer {
         html += `
             <div class="sidebar-position-card is-target">
                 <div class="sidebar-position-header">
-                    <div class="sidebar-position-label" style="color: ${d.targetPosition.color}">${d.targetPosition.label}</div>
+                    <div class="sidebar-position-label" style="color: var(${d.targetPosition.colorVar})">${d.targetPosition.label}</div>
                     <div class="sidebar-position-subtitle">${d.targetPosition.subtitle}</div>
                 </div>
                 <div class="sidebar-score-bar">
@@ -310,6 +312,11 @@ class ComponentRenderer {
         this.renderMatrix();
         this.renderQuickWins();
         this.initSidebar();
+
+        // 主题切换：粒子等运行时绘制内容同步换色
+        window.themeManager.onChange(() => {
+            this.createParticles();
+        });
 
         // 显示欢迎提示
         setTimeout(() => {

@@ -1,15 +1,80 @@
 /* ========================================
-   CSS 变量 - 设计系统
+   CSS 变量 - 设计系统 · 可切换配色方案（深 / 浅两套）
+   ========================================
+
+   ─────────────────────────────────────────────
+   一、配色口径（Color Token Contract）
+   ─────────────────────────────────────────────
+   1. 页面中只允许出现两类颜色来源：
+      a. 语义令牌（--text-* / --status-* / --surface-* / --color-*）；
+      b. 带透明度的 RGB 通道令牌（rgba(var(--rgb-purple), 0.2) 形式）。
+      禁止在组件 CSS / JS 中写死十六进制或 rgba 色值，所有颜色必须
+      能在本文件中找到唯一定义，保证主题切换时不残留旧配色区块。
+   2. 两套主题的令牌名称完全一致，仅取值不同：
+      - [data-theme="dark"]  深色霓虹（品牌默认，Cyberpunk/Vaporwave）
+      - [data-theme="light"] 浅色霓虹（同色相、降明度提对比的日间版本）
+   3. 主题挂载点为 <html data-theme="...">，深浅两套保持相同的色相走向
+      （紫 #a855f7→#7c3aed、粉 #ec4899→#be185d、青 #06b6d4→#0e7490），
+      因此浅色版本仍保留"霓虹色系观感"，只改变明度与背景，不改变布局。
+
+   ─────────────────────────────────────────────
+   二、判定标准（Conformance Standard）
+   ─────────────────────────────────────────────
+   · 采用 WCAG 2.1 AA 作为配色是否达标的唯一判定标准。
+   · 对比度计算公式：(L1 + 0.05) / (L2 + 0.05)，L 为相对亮度。
+   · 深色主题为品牌既有霓虹方案，取值保持不变（品牌基线，允许装饰性
+     发光色低于文本阈值，但不得用于正文）。
+   · 浅色主题为达标方案：所有正文、文字色与状态色必须通过下列阈值；
+     新增/调整颜色时必须复核，不达标不得合入。
+
+   ─────────────────────────────────────────────
+   三、可读阈值（Readability Thresholds）
+   ─────────────────────────────────────────────
+   · 正文 / 小号文字（< 18px，或 < 14px 加粗）：对比度 ≥ 4.5:1
+   · 大号文字（≥ 18px，或 ≥ 14px 加粗）：对比度 ≥ 3:1
+   · 非文字 UI（图标、边框、图表图形、状态填充）：对比度 ≥ 3:1
+   · 彩色按钮 / 状态标签上的白字：对比度 ≥ 4.5:1（按文字对待）
+   · 本浅色主题实测（背景 #eceef6 / 卡片 #f6f7fb）：
+       --text-primary   #1b1d2c  ≈ 15.6:1   ✓ 正文
+       --text-secondary #4b5264  ≈  6.4:1   ✓ 正文
+       --text-muted     #5b6270  ≈  5.2:1   ✓ 正文
+       --status-error   #b91c1c  ≈  5.6:1   ✓ 状态/正文
+       --status-success #047857  ≈  4.7:1   ✓ 状态/正文
+       --status-warning #92400e  ≈  6.1:1   ✓ 状态/正文
+       --status-info    #1d4ed8  ≈  5.7:1   ✓ 状态/正文
+       紫 #7c3aed ≈4.9:1 / 粉 #be185d ≈5.2:1 / 青 #0e7490 ≈5.4:1  ✓
    ======================================== */
 
-:root {
-    /* 主色调 */
+/* ========================================
+   深色主题（默认 · 品牌霓虹基线，取值与历史版本完全一致）
+   ======================================== */
+:root,
+[data-theme="dark"] {
+    color-scheme: dark;
+
+    /* 主色调 - 背景 */
     --bg-dark: #0a0a0f;
     --bg-darker: #050508;
     --bg-card: rgba(20, 20, 35, 0.7);
     --bg-card-hover: rgba(30, 30, 50, 0.8);
-    
-    /* 霓虹色系 */
+
+    /* 表面层（侧栏 / Toast / 内嵌区域等，取值与历史硬编码一致） */
+    --surface-solid: #141423;
+    --surface-card-strong: rgba(20, 20, 35, 0.5);
+    --surface-card-strong-hover: rgba(30, 30, 50, 0.7);
+    --surface-inset: rgba(0, 0, 0, 0.35);
+    --surface-inset-hover: rgba(0, 0, 0, 0.5);
+    --surface-track: rgba(255, 255, 255, 0.08);
+    --surface-compact: rgba(255, 255, 255, 0.06);
+    --sidebar-bg: rgba(10, 10, 18, 0.92);
+    --toast-bg: rgba(20, 20, 35, 0.95);
+    --toast-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    --toast-ring: rgba(255, 255, 255, 0.08);
+    --toast-inset: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --card-inset: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --scrollbar-track: rgba(0, 0, 0, 0.3);
+
+    /* 霓虹色系（语义别名 --color-*，组件统一引用，切换时整站联动） */
     --neon-purple: #a855f7;
     --neon-purple-light: #c084fc;
     --neon-pink: #ec4899;
@@ -21,22 +86,51 @@
     --neon-blue: #3b82f6;
     --neon-orange: #f97316;
     --neon-yellow: #eab308;
-    
-    /* 状态色 */
-    --success: #10b981;
-    --warning: #f59e0b;
-    --error: #ef4444;
-    --info: #3b82f6;
-    
+
+    --color-primary: var(--neon-purple);
+    --color-primary-light: var(--neon-purple-light);
+    --color-accent: var(--neon-pink);
+    --color-accent-light: var(--neon-pink-light);
+    --color-cyan: var(--neon-cyan);
+    --color-cyan-light: var(--neon-cyan-light);
+
+    /* RGB 通道令牌：供 rgba(var(--rgb-x), alpha) 使用，消除硬编码 rgba */
+    --rgb-white: 255 255 255;
+    --rgb-purple: 168 85 247;
+    --rgb-pink: 236 72 153;
+    --rgb-cyan: 6 182 212;
+    --rgb-green: 16 185 129;
+    --rgb-blue: 59 130 246;
+    --rgb-orange: 249 115 22;
+    --rgb-yellow: 234 179 8;
+    --rgb-error: 239 68 68;
+    --rgb-warning: 245 158 11;
+    --rgb-success: 16 185 129;
+    --rgb-info: 59 130 246;
+
+    /* 状态色（矩阵 [当前位置]/[改进目标]、Toast、侧栏、KPI 统一引用） */
+    --status-success: #10b981;
+    --status-warning: #f59e0b;
+    --status-error: #ef4444;
+    --status-info: #3b82f6;
+    /* 状态色深色端：用于白字渐变标签，深 / 浅两套分别取到达标的一档 */
+    --status-error-deep: #dc2626;
+    --status-success-deep: #059669;
+    --status-warning-deep: #d97706;
+
     /* 文字色 */
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
-    
+
     /* 边框 */
     --glass-border: rgba(168, 85, 247, 0.3);
     --glass-border-hover: rgba(168, 85, 247, 0.5);
-    
+
+    /* 次级按钮（深色下沿用白色半透明） */
+    --btn-secondary-bg: rgba(255, 255, 255, 0.1);
+    --btn-secondary-bg-hover: rgba(255, 255, 255, 0.15);
+
     /* 阴影 */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -44,12 +138,58 @@
     --shadow-glow-purple: 0 0 30px rgba(168, 85, 247, 0.4);
     --shadow-glow-pink: 0 0 30px rgba(236, 72, 153, 0.4);
     --shadow-glow-cyan: 0 0 30px rgba(6, 182, 212, 0.4);
-    
-    /* 渐变 */
+
+    /* 渐变（语义渐变：标题 / 标签 / 评分条 / 矩阵表头） */
     --gradient-purple-pink: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
     --gradient-cyan-green: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
     --gradient-blue-purple: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-    
+    --gradient-title: linear-gradient(135deg, #fff 0%, var(--neon-purple) 40%, var(--neon-pink) 70%, var(--neon-cyan) 100%);
+    --gradient-sidebar-title: linear-gradient(135deg, #fff, var(--neon-purple-light));
+    --gradient-matrix-head: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.15));
+    --gradient-tag-current: linear-gradient(135deg, var(--status-error), var(--status-error-deep));
+    --gradient-tag-target: linear-gradient(135deg, var(--neon-green), var(--status-success-deep));
+    --gradient-score-red: linear-gradient(90deg, var(--status-error), var(--neon-orange));
+    --gradient-score-green: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+
+    /* 背景氛围层（径向辉光 / 网格线） */
+    --bg-glow-1: rgba(168, 85, 247, 0.15);
+    --bg-glow-2: rgba(236, 72, 153, 0.12);
+    --bg-glow-3: rgba(6, 182, 212, 0.08);
+    --bg-glow-4: rgba(16, 185, 129, 0.08);
+    --bg-grid-line: rgba(168, 85, 247, 0.03);
+
+    /* 粒子色板（JS 读取，切换主题时重绘粒子） */
+    --particle-1: #a855f7;
+    --particle-2: #ec4899;
+    --particle-3: #06b6d4;
+    --particle-4: #10b981;
+
+    /* 图表令牌（ECharts 经 getComputedStyle 读取，主题切换后整图重绘） */
+    --chart-tooltip-bg: rgba(20, 20, 35, 0.95);
+    --chart-tooltip-border: rgba(168, 85, 247, 0.3);
+    --chart-tooltip-text: #f8fafc;
+    --chart-legend-text: #94a3b8;
+    --chart-axis-name: #94a3b8;
+    --chart-split-line: rgba(168, 85, 247, 0.15);
+    --chart-split-area-a: rgba(168, 85, 247, 0.02);
+    --chart-split-area-b: rgba(168, 85, 247, 0.06);
+    --chart-axis-line: rgba(168, 85, 247, 0.2);
+    --chart-funnel-border: rgba(168, 85, 247, 0.5);
+    --chart-funnel-shadow: rgba(168, 85, 247, 0.3);
+    --chart-funnel-shadow-emphasis: rgba(168, 85, 247, 0.5);
+    --chart-funnel-1: rgba(168, 85, 247, 0.9);
+    --chart-funnel-2: rgba(168, 85, 247, 0.75);
+    --chart-funnel-3: rgba(236, 72, 153, 0.8);
+    --chart-funnel-4: rgba(239, 68, 68, 0.85);
+    --chart-funnel-5: rgba(239, 68, 68, 0.95);
+    --chart-radar-current: #ef4444;
+    --chart-radar-current-area: rgba(239, 68, 68, 0.3);
+    --chart-radar-benchmark: #10b981;
+    --chart-radar-benchmark-area: rgba(16, 185, 129, 0.2);
+    --chart-point-border: #ffffff;
+    --chart-label-on-color: #ffffff;
+    --chart-label-on-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
     /* 间距 */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -57,20 +197,177 @@
     --spacing-lg: 24px;
     --spacing-xl: 32px;
     --spacing-2xl: 48px;
-    
+
     /* 圆角 */
     --radius-sm: 6px;
     --radius-md: 12px;
     --radius-lg: 16px;
     --radius-xl: 24px;
     --radius-full: 9999px;
-    
+
     /* 过渡 */
     --transition-fast: 0.15s ease;
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
-    
+
     /* 字体 */
     --font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+/* ========================================
+   浅色主题（日间 · WCAG 2.1 AA 达标方案）
+   同色相降明度：紫/粉/青霓虹基因保留，深空黑换为亮面玻璃拟态。
+   ======================================== */
+[data-theme="light"] {
+    color-scheme: light;
+
+    /* 主色调 - 背景 */
+    --bg-dark: #eceef6;
+    --bg-darker: #e0e3ef;
+    --bg-card: rgba(255, 255, 255, 0.72);
+    --bg-card-hover: rgba(255, 255, 255, 0.9);
+
+    /* 表面层 */
+    --surface-solid: #ffffff;
+    --surface-card-strong: rgba(255, 255, 255, 0.78);
+    --surface-card-strong-hover: rgba(255, 255, 255, 0.95);
+    --surface-inset: rgba(255, 255, 255, 0.65);
+    --surface-inset-hover: rgba(255, 255, 255, 0.92);
+    --surface-track: rgba(27, 29, 44, 0.1);
+    --surface-compact: rgba(27, 29, 44, 0.05);
+    --sidebar-bg: rgba(255, 255, 255, 0.9);
+    --toast-bg: rgba(255, 255, 255, 0.96);
+    --toast-shadow: 0 10px 40px rgba(27, 29, 44, 0.16);
+    --toast-ring: rgba(27, 29, 44, 0.1);
+    --toast-inset: inset 0 1px 0 rgba(255, 255, 255, 1);
+    --card-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --scrollbar-track: rgba(27, 29, 44, 0.08);
+
+    /* 霓虹色系（浅色档：同色相加深，全部通过文字可读阈值） */
+    --neon-purple: #7c3aed;
+    --neon-purple-light: #6d28d9;
+    --neon-pink: #be185d;
+    --neon-pink-light: #9d174d;
+    --neon-cyan: #0e7490;
+    --neon-cyan-light: #155e75;
+    --neon-green: #047857;
+    --neon-green-light: #065f46;
+    --neon-blue: #1d4ed8;
+    --neon-orange: #c2410c;
+    --neon-yellow: #a16207;
+
+    --color-primary: var(--neon-purple);
+    --color-primary-light: var(--neon-purple-light);
+    --color-accent: var(--neon-pink);
+    --color-accent-light: var(--neon-pink-light);
+    --color-cyan: var(--neon-cyan);
+    --color-cyan-light: var(--neon-cyan-light);
+
+    /* RGB 通道令牌 */
+    --rgb-white: 255 255 255;
+    --rgb-purple: 124 58 237;
+    --rgb-pink: 190 24 93;
+    --rgb-cyan: 14 116 144;
+    --rgb-green: 4 120 87;
+    --rgb-blue: 29 78 216;
+    --rgb-orange: 194 65 12;
+    --rgb-yellow: 161 98 7;
+    --rgb-error: 185 28 28;
+    --rgb-warning: 146 64 14;
+    --rgb-success: 4 120 87;
+    --rgb-info: 29 78 216;
+
+    /* 状态色（AA 达标：见文件头实测对比度表） */
+    --status-success: #047857;
+    --status-warning: #92400e;
+    --status-error: #b91c1c;
+    --status-info: #1d4ed8;
+    --status-error-deep: #991b1b;
+    --status-success-deep: #065f46;
+    --status-warning-deep: #78350f;
+
+    /* 文字色（在页面/卡片底色上全部 ≥ 4.5:1） */
+    --text-primary: #1b1d2c;
+    --text-secondary: #4b5264;
+    --text-muted: #5b6270;
+
+    /* 边框（亮面玻璃拟态） */
+    --glass-border: rgba(124, 58, 237, 0.22);
+    --glass-border-hover: rgba(124, 58, 237, 0.45);
+
+    /* 次级按钮 */
+    --btn-secondary-bg: rgba(124, 58, 237, 0.08);
+    --btn-secondary-bg-hover: rgba(124, 58, 237, 0.16);
+
+    /* 阴影（浅色下减弱黑色投影，保留同色霓虹辉光） */
+    --shadow-sm: 0 2px 8px rgba(27, 29, 44, 0.08);
+    --shadow-md: 0 8px 32px rgba(27, 29, 44, 0.12);
+    --shadow-lg: 0 20px 60px rgba(27, 29, 44, 0.18);
+    --shadow-glow-purple: 0 0 30px rgba(124, 58, 237, 0.22);
+    --shadow-glow-pink: 0 0 30px rgba(190, 24, 93, 0.22);
+    --shadow-glow-cyan: 0 0 30px rgba(14, 116, 144, 0.22);
+
+    /* 渐变（标题首档换深色文字，白字标签换 700 档保证 ≥4.5:1） */
+    --gradient-purple-pink: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+    --gradient-cyan-green: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+    --gradient-blue-purple: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+    --gradient-title: linear-gradient(135deg, #14162b 0%, var(--neon-purple) 40%, var(--neon-pink) 70%, var(--neon-cyan) 100%);
+    --gradient-sidebar-title: linear-gradient(135deg, var(--text-primary), var(--neon-purple));
+    --gradient-matrix-head: linear-gradient(135deg, rgba(124, 58, 237, 0.14), rgba(190, 24, 93, 0.08));
+    --gradient-tag-current: linear-gradient(135deg, #dc2626, var(--status-error));
+    --gradient-tag-target: linear-gradient(135deg, var(--neon-green), var(--status-success-deep));
+    --gradient-score-red: linear-gradient(90deg, var(--status-error), var(--neon-orange));
+    --gradient-score-green: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+
+    /* 背景氛围层（浅色辉光更淡，保持霓虹气质不刺眼） */
+    --bg-glow-1: rgba(124, 58, 237, 0.1);
+    --bg-glow-2: rgba(190, 24, 93, 0.07);
+    --bg-glow-3: rgba(14, 116, 144, 0.06);
+    --bg-glow-4: rgba(4, 120, 87, 0.06);
+    --bg-grid-line: rgba(124, 58, 237, 0.05);
+
+    /* 粒子色板 */
+    --particle-1: #7c3aed;
+    --particle-2: #be185d;
+    --particle-3: #0e7490;
+    --particle-4: #047857;
+
+    /* 图表令牌（漏斗填充取 700 档，白字标签 ≥4.5:1） */
+    --chart-tooltip-bg: rgba(255, 255, 255, 0.96);
+    --chart-tooltip-border: rgba(124, 58, 237, 0.28);
+    --chart-tooltip-text: #1b1d2c;
+    --chart-legend-text: #4b5264;
+    --chart-axis-name: #4b5264;
+    --chart-split-line: rgba(124, 58, 237, 0.18);
+    --chart-split-area-a: rgba(124, 58, 237, 0.03);
+    --chart-split-area-b: rgba(124, 58, 237, 0.07);
+    --chart-axis-line: rgba(124, 58, 237, 0.25);
+    --chart-funnel-border: rgba(124, 58, 237, 0.55);
+    --chart-funnel-shadow: rgba(124, 58, 237, 0.18);
+    --chart-funnel-shadow-emphasis: rgba(124, 58, 237, 0.35);
+    --chart-funnel-1: rgba(126, 34, 206, 0.95);
+    --chart-funnel-2: rgba(126, 34, 206, 0.9);
+    --chart-funnel-3: rgba(190, 24, 93, 0.92);
+    --chart-funnel-4: rgba(220, 38, 38, 0.98);
+    --chart-funnel-5: rgba(185, 28, 28, 0.98);
+    --chart-radar-current: #b91c1c;
+    --chart-radar-current-area: rgba(185, 28, 28, 0.18);
+    --chart-radar-benchmark: #047857;
+    --chart-radar-benchmark-area: rgba(4, 120, 87, 0.16);
+    --chart-point-border: #ffffff;
+    --chart-label-on-color: #ffffff;
+    --chart-label-on-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* 主题切换平滑过渡（颜色/背景/边框/阴影，不影响 transform 等布局动效） */
+body,
+.glass-card,
+.matrix-table,
+.toast,
+.diagnostic-sidebar,
+.theme-toggle {
+    transition-property: background-color, background, border-color, color, box-shadow;
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
 }

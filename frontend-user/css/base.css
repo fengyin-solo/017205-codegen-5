@@ -1,5 +1,6 @@
 /* ========================================
    基础样式 - 重置与通用
+   颜色一律引用 variables.css 中的语义令牌，禁止写死色值
    ======================================== */
 
 * {
@@ -31,11 +32,11 @@ body {
     width: 100%;
     height: 100%;
     z-index: -2;
-    background: 
-        radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(236, 72, 153, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 60%),
-        radial-gradient(ellipse at 10% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 40%);
+    background:
+        radial-gradient(ellipse at 20% 20%, var(--bg-glow-1) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, var(--bg-glow-2) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, var(--bg-glow-3) 0%, transparent 60%),
+        radial-gradient(ellipse at 10% 80%, var(--bg-glow-4) 0%, transparent 40%);
     animation: bgPulse 10s ease-in-out infinite;
 }
 
@@ -52,9 +53,9 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    background-image: 
-        linear-gradient(rgba(168, 85, 247, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(168, 85, 247, 0.03) 1px, transparent 1px);
+    background-image:
+        linear-gradient(var(--bg-grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--bg-grid-line) 1px, transparent 1px);
     background-size: 60px 60px;
     mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
     -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
@@ -104,7 +105,7 @@ body {
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-md), var(--card-inset);
     transition: all var(--transition-normal);
 }
 
@@ -121,7 +122,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--scrollbar-track);
     border-radius: var(--radius-sm);
 }
 
@@ -137,8 +138,8 @@ body {
 
 /* 选中文本 */
 ::selection {
-    background: rgba(168, 85, 247, 0.4);
-    color: white;
+    background: rgba(var(--rgb-purple), 0.4);
+    color: var(--text-primary);
 }
 
 /* 链接 */
@@ -177,7 +178,7 @@ a:hover {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(var(--rgb-white), 0.2), transparent);
     transition: left 0.5s ease;
 }
 
@@ -197,13 +198,13 @@ a:hover {
 }
 
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--btn-secondary-bg);
     color: var(--text-primary);
     border: 1px solid var(--glass-border);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--btn-secondary-bg-hover);
     border-color: var(--glass-border-hover);
 }
 
@@ -211,7 +212,7 @@ a:hover {
 .loading-spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(168, 85, 247, 0.2);
+    border: 3px solid rgba(var(--rgb-purple), 0.2);
     border-top-color: var(--neon-purple);
     border-radius: 50%;
     animation: spin 1s linear infinite;

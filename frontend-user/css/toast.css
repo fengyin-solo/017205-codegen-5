@@ -1,5 +1,6 @@
 /* ========================================
    Toast 提示组件样式
+   颜色一律引用 variables.css 中的语义令牌，禁止写死色值
    ======================================== */
 
 .toast-container {
@@ -19,14 +20,14 @@
     align-items: flex-start;
     gap: 14px;
     padding: 16px 20px;
-    background: rgba(20, 20, 35, 0.95);
+    background: var(--toast-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: var(--radius-lg);
-    box-shadow: 
-        0 10px 40px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow:
+        var(--toast-shadow),
+        0 0 0 1px var(--toast-ring),
+        var(--toast-inset);
     pointer-events: auto;
     transform: translateX(120%);
     opacity: 0;
@@ -74,22 +75,22 @@
 
 .toast-success::before {
     background: linear-gradient(180deg, var(--neon-green), var(--neon-cyan));
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 20px rgba(var(--rgb-success), 0.5);
 }
 
 .toast-error::before {
-    background: linear-gradient(180deg, var(--error), var(--neon-orange));
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+    background: linear-gradient(180deg, var(--status-error), var(--neon-orange));
+    box-shadow: 0 0 20px rgba(var(--rgb-error), 0.5);
 }
 
 .toast-warning::before {
-    background: linear-gradient(180deg, var(--warning), var(--neon-yellow));
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+    background: linear-gradient(180deg, var(--status-warning), var(--neon-yellow));
+    box-shadow: 0 0 20px rgba(var(--rgb-warning), 0.5);
 }
 
 .toast-info::before {
     background: linear-gradient(180deg, var(--neon-purple), var(--neon-pink));
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+    box-shadow: 0 0 20px rgba(var(--rgb-purple), 0.5);
 }
 
 /* Toast 图标 */
@@ -106,24 +107,24 @@
 }
 
 .toast-success .toast-icon {
-    background: rgba(16, 185, 129, 0.2);
+    background: rgba(var(--rgb-success), 0.2);
     color: var(--neon-green);
     animation: iconPulse 2s ease-in-out infinite;
 }
 
 .toast-error .toast-icon {
-    background: rgba(239, 68, 68, 0.2);
-    color: var(--error);
+    background: rgba(var(--rgb-error), 0.2);
+    color: var(--status-error);
     animation: iconShake 0.5s ease-in-out;
 }
 
 .toast-warning .toast-icon {
-    background: rgba(245, 158, 11, 0.2);
-    color: var(--warning);
+    background: rgba(var(--rgb-warning), 0.2);
+    color: var(--status-warning);
 }
 
 .toast-info .toast-icon {
-    background: rgba(168, 85, 247, 0.2);
+    background: rgba(var(--rgb-purple), 0.2);
     color: var(--neon-purple);
 }
 
@@ -163,7 +164,7 @@
     width: 24px;
     height: 24px;
     border: none;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-compact);
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
     cursor: pointer;
@@ -176,7 +177,7 @@
 }
 
 .toast-close:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--surface-track);
     color: var(--text-primary);
     transform: rotate(90deg);
 }
@@ -187,7 +188,7 @@
     bottom: 0;
     left: 0;
     height: 3px;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(var(--rgb-white), 0.3);
     border-radius: 0 0 0 var(--radius-lg);
     animation: toastProgress linear forwards;
 }
@@ -197,11 +198,11 @@
 }
 
 .toast-error .toast-progress {
-    background: linear-gradient(90deg, var(--error), var(--neon-orange));
+    background: linear-gradient(90deg, var(--status-error), var(--neon-orange));
 }
 
 .toast-warning .toast-progress {
-    background: linear-gradient(90deg, var(--warning), var(--neon-yellow));
+    background: linear-gradient(90deg, var(--status-warning), var(--neon-yellow));
 }
 
 .toast-info .toast-progress {
@@ -221,7 +222,7 @@
         left: 12px;
         max-width: none;
     }
-    
+
     .toast {
         padding: 14px 16px;
     }
